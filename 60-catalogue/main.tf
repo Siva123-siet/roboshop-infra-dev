@@ -34,8 +34,8 @@ resource "terraform_data" "catalogue" {
   ]
 
    provisioner "file" {
-    source      = "bootstrap.sh"
-    destination = "/tmp/bootstrap.sh"
+    source      = "catalogue.sh"
+    destination = "/tmp/catalogue.sh"
   }
 
   connection {
@@ -47,15 +47,15 @@ resource "terraform_data" "catalogue" {
 
   provisioner "remote-exec" {
      inline = [
-      "chmod +x /tmp/bootstrap.sh",
-      "sudo sh /tmp/bootstrap.sh catalogue",
+      "chmod +x /tmp/catalogue.sh",
+      "sudo sh /tmp/catalogue.sh catalogue ${var.environment}",
     ]
   }
 }
 
 resource "aws_route53_record" "catalogue" {
   zone_id = var.zone_id
-  name    = "catalogue.${var.zone_name}"
+  name    = "catalogue-${var.environment}.${var.zone_name}"
   type    = "A"
   ttl     = 1
   records = [aws_instance.catalogue.private_ip]
